@@ -1,0 +1,60 @@
+<DialImage@Image>:
+    angle: 0
+    canvas.before:
+        PushMatrix
+        Rotate:
+            angle: root.angle
+            axis:0,0,1
+            origin:root.center
+    canvas.after:
+        PopMatrix
+
+
+<DialBox>:
+    
+    manager: app.manager
+    orientation: 'vertical'
+    dial_image: dial_image_
+    legend_image: legend_image_
+
+    canvas.before :
+        Color : 
+            rgb : (0.3,0.3,0.3)
+        Rectangle :
+            size : self.size
+            pos : self.pos
+
+    FloatLayout:
+        size_hint :(1, 1) 
+        canvas.before :
+            Color : 
+                rgb : (0.1,0.1,0.1)
+            Rectangle :
+                size : self.size
+                pos : self.pos
+        DialImage:
+            id : dial_image_
+            canvas.before :
+                Color : 
+                    rgb : (0.1,0.1,0.1)
+                Rectangle :
+                    size : self.size
+                    pos : self.pos
+            angle: root.theta
+            pos_hint : {'center_x':0.5, 'center_y': 0.5}
+            size_hint :(None, None) 
+            size :(500, 500) 
+            source:'images/wheel.png'
+            on_touch_move: root.on_image_touch_move(*args)
+            on_touch_up: root.on_image_release(*args)
+            on_touch_down: root.on_image_touch_down(*args)
+        
+        Image:
+            id : legend_image_
+            pos_hint : {'center_y': 0.5}
+            x: dial_image_.right - dp(205)
+            size_hint :(None, None) 
+            size :(120, 180) 
+            source:''
+            opacity: 0 #if root.moved==True else 1.0
+

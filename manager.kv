@@ -1,0 +1,17 @@
+<Manager>:
+
+    orientation: 'vertical'
+    image_box: image_box_
+
+    Image:
+        id: image_box_
+        source:'images/connecting.png'
+        allow_stretch: True
+        size_hint: (1, 1)
+
+        canvas.before :
+            Color : 
+                rgb : (0.1,0.1,0.1)
+            Rectangle :
+                size : self.size
+                pos : self.pos
