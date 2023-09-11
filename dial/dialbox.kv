@@ -1,4 +1,5 @@
 <DialImage@Image>:
+
     angle: 0
     canvas.before:
         PushMatrix
@@ -17,29 +18,17 @@
     dial_image: dial_image_
     legend_image: legend_image_
 
-    canvas.before :
-        Color : 
-            rgb : (0.3,0.3,0.3)
-        Rectangle :
-            size : self.size
-            pos : self.pos
-
     FloatLayout:
+
         size_hint :(1, 1) 
         canvas.before :
-            Color : 
-                rgb : (0.1,0.1,0.1)
             Rectangle :
+                source:'images/background.png'
                 size : self.size
                 pos : self.pos
+
         DialImage:
             id : dial_image_
-            canvas.before :
-                Color : 
-                    rgb : (0.1,0.1,0.1)
-                Rectangle :
-                    size : self.size
-                    pos : self.pos
             angle: root.theta
             pos_hint : {'center_x':0.5, 'center_y': 0.5}
             size_hint :(None, None) 
