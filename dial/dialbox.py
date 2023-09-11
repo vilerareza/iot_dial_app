@@ -1,14 +1,17 @@
+import math
+import time
+from itertools import cycle
+
 from kivy.lang import Builder
 from kivy.properties import ObjectProperty, NumericProperty, BooleanProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
-from kivy.graphics.texture import Texture
-from kivy.core.image import Image as CoreImage
-import math
+from kivy.clock import Clock
+from functools import partial
 
 import socket
 import selectors
-import threading
+from threading import Thread, Condition
 
 Builder.load_file('dialbox.kv')
 
@@ -16,15 +19,27 @@ Builder.load_file('dialbox.kv')
 class DialBox(BoxLayout):
 
     manager = ObjectProperty(None)
+    # Dial wheel image widget
     dial_image = ObjectProperty(None)
+    # Selected legend image widget
     legend_image = ObjectProperty(None)
+    # Set when the wheel is being moved
+    moved = BooleanProperty(False)
+    # The angle of the wheel. Initiated to 288 (the position where the no-option is rotated to 0 degree)
     theta = NumericProperty(288)
+    # Adjusted theta to accomodate angle difference between images
     adjusted_theta = 0
+    # Difference between current angle and the point of touch
     delta_theta = 0
+    # Angle step for each segment
     segment_step = 36
     step_thresh = 0
+    # Current option position (used to trigger the main app)
     option_pos = 0
-    moved = BooleanProperty(False)
+    
+    # Auto selection timeout in sec
+    auto_selection_timeout = 300
+    
 
     # Connections to app
     host = '0.0.0.0'
@@ -36,7 +51,10 @@ class DialBox(BoxLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # Start the listening socket from main app
         self.listen_thread()
+        # Start the auto selection thread
+        self.auto_select_thread()
 
     def __accept_wrapper(self,sock):
         # accept new connections
@@ -48,10 +66,9 @@ class DialBox(BoxLayout):
         print (self.conn)
 
     def listen_thread(self):
-        self.t_listen = threading.Thread(target = self.__listen)
+        self.t_listen = Thread(target = self.__listen)
         self.t_listen.daemon = True
         self.t_listen.start()
-        print(str(self.t_listen.is_alive()))
 
     def __listen(self):
         self.lsock.bind((self.host,self.port))
@@ -118,6 +135,8 @@ class DialBox(BoxLayout):
         if self.moved:
 
             if self.theta >=0 and self.theta <18-self.step_thresh:
+                # Snap
+                self.theta=0
                 # Reset adjusted theta (offset)
                 self.adjusted_theta = 0
                 # Change the image
@@ -134,6 +153,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 1 {self.theta}')
 
             elif self.theta >=18+self.step_thresh and self.theta <54-self.step_thresh:
+                # Snap
+                self.theta = 36
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step
                 theta_ = self.theta - self.adjusted_theta
@@ -154,6 +175,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 2 {self.theta}')
 
             elif self.theta >=54+self.step_thresh and self.theta <90-self.step_thresh:
+                # Snap
+                self.theta = 72
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*2
                 theta_ = self.theta - self.adjusted_theta
@@ -174,6 +197,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 3 {self.theta}')
 
             elif self.theta >=90+self.step_thresh and self.theta <126-self.step_thresh:
+                # Snap
+                self.theta = 108
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*3
                 theta_ = self.theta - self.adjusted_theta
@@ -192,6 +217,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 4 {self.theta}')
 
             elif self.theta >=126+self.step_thresh and self.theta <162-self.step_thresh:
+                # Snap
+                self.theta = 144
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*4
                 theta_ = self.theta - self.adjusted_theta
@@ -212,6 +239,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 5 {self.theta}')
 
             elif self.theta >=162+self.step_thresh and self.theta <198-self.step_thresh:
+                # Snap
+                self.theta = 180
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*5
                 theta_ = self.theta - self.adjusted_theta
@@ -232,6 +261,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 6 {self.theta}')
 
             elif self.theta >=198+self.step_thresh and self.theta <234-self.step_thresh:
+                # Snap
+                self.theta = 216
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*6
                 theta_ = self.theta - self.adjusted_theta
@@ -252,6 +283,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 7 {self.theta}')
 
             elif self.theta >=234+self.step_thresh and self.theta <270-self.step_thresh:
+                # Snap
+                self.theta = 252
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*7
                 theta_ = self.theta - self.adjusted_theta
@@ -272,6 +305,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 8 {self.theta}')
 
             elif self.theta >=270+self.step_thresh and self.theta <306-self.step_thresh:
+                # Snap
+                self.theta = 288
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*8
                 theta_ = self.theta - self.adjusted_theta
@@ -290,6 +325,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 9 {self.theta}')
 
             elif self.theta >=306+self.step_thresh and self.theta <342-self.step_thresh:
+                # Snap
+                self.theta = 324
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*9
                 theta_ = self.theta - self.adjusted_theta
@@ -310,6 +347,8 @@ class DialBox(BoxLayout):
                 # print (f'theta release 10 {self.theta}')
 
             elif self.theta >=342+self.step_thresh and self.theta <360-self.step_thresh:
+                # Snap
+                self.theta = 0
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = 0
                 # Change the image
@@ -327,4 +366,193 @@ class DialBox(BoxLayout):
 
         self.moved = False
 
+
+    def auto_select_thread(self):
+        self.t_auto_select = Thread(target = self.__auto_select)
+        self.t_auto_select.daemon = True
+        self.t_auto_select.start()
+
+
+    def __auto_select(self):
+
+        # List of wheel thetas. Skip the no-option position
+        theta__ = [0, 36, 72, 144, 180, 216, 252, 324]
+
+        for theta_ in cycle(theta__):
+
+            time.sleep(self.auto_selection_timeout)
             
+            # Break when stopped
+            if self.stop_flag:
+                break
+
+            # Check if wheel is being moved
+            if self.moved:
+                continue
+
+            # Rotate the wheel to theta_   
+            self.theta = theta_
+
+            if self.theta >=0 and self.theta <18-self.step_thresh:
+                # Reset adjusted theta (offset)
+                self.adjusted_theta = 0
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_1.png', 'images/legend_wheel_1.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 0
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+
+            elif self.theta >=18+self.step_thresh and self.theta <54-self.step_thresh:
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_5.png', 'images/legend_wheel_5.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 1
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 2 {self.theta}')
+
+            elif self.theta >=54+self.step_thresh and self.theta <90-self.step_thresh:
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step*2
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_4.png', 'images/legend_wheel_4.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 2
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 3 {self.theta}')
+
+            elif self.theta >=126+self.step_thresh and self.theta <162-self.step_thresh:
+                # Snap
+                self.theta = 144
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step*4
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_2.png', 'images/legend_wheel_2.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 4
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 5 {self.theta}')
+
+            elif self.theta >=162+self.step_thresh and self.theta <198-self.step_thresh:
+                # Snap
+                self.theta = 180
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step*5
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_1.png', 'images/legend_wheel_1.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 5
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 6 {self.theta}')
+
+            elif self.theta >=198+self.step_thresh and self.theta <234-self.step_thresh:
+                # Snap
+                self.theta = 216
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step*6
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_5.png', 'images/legend_wheel_5.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 6
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 7 {self.theta}')
+
+            elif self.theta >=234+self.step_thresh and self.theta <270-self.step_thresh:
+                # Snap
+                self.theta = 252
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step*7
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_4.png', 'images/legend_wheel_4.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 7
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 8 {self.theta}')
+
+            elif self.theta >=306+self.step_thresh and self.theta <342-self.step_thresh:
+                # Snap
+                self.theta = 324
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step*9
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_2.png', 'images/legend_wheel_2.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 9
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 10 {self.theta}')
+
+            elif self.theta >=342+self.step_thresh and self.theta <360-self.step_thresh:
+                # Snap
+                self.theta = 0
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = 0
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_1.png', 'images/legend_wheel_1.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 10
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta releaes 11 {self.theta}')
+
+
+    def update_images(self, dial_img_source, legend_img_source, *args):
+        # Change the image
+        self.dial_image.source = dial_img_source
+        # Change the legend image
+        self.legend_image.source = legend_img_source
+        self.legend_image.opacity= 1
