@@ -11,7 +11,7 @@ from functools import partial
 
 import socket
 import selectors
-from threading import Thread, Condition
+from threading import Thread
 
 Builder.load_file('dialbox.kv')
 
@@ -22,11 +22,12 @@ class DialBox(BoxLayout):
     # Dial wheel image widget
     dial_image = ObjectProperty(None)
     # Selected legend image widget
-    legend_image = ObjectProperty(None)
+    title_image = ObjectProperty(None)
     # Set when the wheel is being moved
     moved = BooleanProperty(False)
     # The angle of the wheel. Initiated to 288 (the position where the no-option is rotated to 0 degree)
-    theta = NumericProperty(288)
+    #theta = NumericProperty(288)
+    theta = NumericProperty(0)
     # Adjusted theta to accomodate angle difference between images
     adjusted_theta = 0
     # Difference between current angle and the point of touch
@@ -36,11 +37,10 @@ class DialBox(BoxLayout):
     step_thresh = 0
     # Current option position (used to trigger the main app)
     option_pos = 0
-    
+
     # Auto selection timeout in sec
     auto_selection_timeout = 300
     
-
     # Connections to app
     host = '0.0.0.0'
     port = 65003
@@ -84,6 +84,7 @@ class DialBox(BoxLayout):
                     
 
     def on_image_touch_move(self, *args):
+
         if args[0].collide_point(*args[1].pos):
 
             if args[0] == self.dial_image:
@@ -104,12 +105,6 @@ class DialBox(BoxLayout):
                 self.dial_image.source = 'images/wheel.png'
                 self.moved = True
 
-                # Send data to socket
-                # try:
-                #     self.conn.send(self.theta.to_bytes(2, 'big'))
-                # except Exception as e:
-                #     pass
-
 
     def on_image_touch_down(self, *args):
         if args[0].collide_point(*args[1].pos):
@@ -125,13 +120,10 @@ class DialBox(BoxLayout):
                 if self.delta_theta < 0:
                     self.delta_theta += 360
                 
-                self.legend_image.opacity= 0
-                #print (f'delta theta {self.delta_theta}' )
-
 
     def on_image_release(self, *args):
 
-        # print (self.theta)
+        print (self.theta)
         if self.moved:
 
             if self.theta >=0 and self.theta <18-self.step_thresh:
@@ -140,10 +132,7 @@ class DialBox(BoxLayout):
                 # Reset adjusted theta (offset)
                 self.adjusted_theta = 0
                 # Change the image
-                self.dial_image.source = 'images/wheel_1.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_1.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_williot.png'
                 # Update position and send position data to socket
                 self.option_pos = 0
                 try:
@@ -162,10 +151,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_5.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_5.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_carbon.png'
                 # Update position and send position data to socket
                 self.option_pos = 1
                 try:
@@ -184,10 +170,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_4.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_4.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_temp.png'
                 # Update position and send position data to socket
                 self.option_pos = 2
                 try:
@@ -206,8 +189,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_3.png'
-                self.legend_image.opacity= 0
+                self.dial_image.source = 'images/wheel_fresh.png'
                 # Update position and send position data to socket
                 self.option_pos = 3
                 try:
@@ -226,10 +208,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_2.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_2.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_food.png'
                 # Update position and send position data to socket
                 self.option_pos = 4
                 try:
@@ -248,10 +227,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_1.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_1.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_williot.png'
                 # Update position and send position data to socket
                 self.option_pos = 5
                 try:
@@ -270,10 +246,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_5.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_5.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_carbon.png'
                 # Update position and send position data to socket
                 self.option_pos = 6
                 try:
@@ -292,10 +265,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_4.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_4.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_temp.png'
                 # Update position and send position data to socket
                 self.option_pos = 7
                 try:
@@ -314,8 +284,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_3.png'
-                self.legend_image.opacity= 0
+                self.dial_image.source = 'images/wheel_fresh.png'
                 # Update position and send position data to socket
                 self.option_pos = 8
                 try:
@@ -334,10 +303,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the image
-                self.dial_image.source = 'images/wheel_2.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_2.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_food.png'
                 # Update position and send position data to socket
                 self.option_pos = 9
                 try:
@@ -352,10 +318,7 @@ class DialBox(BoxLayout):
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = 0
                 # Change the image
-                self.dial_image.source = 'images/wheel_1.png'
-                # Change the legend image
-                self.legend_image.source = 'images/legend_wheel_1.png'
-                self.legend_image.opacity= 1
+                self.dial_image.source = 'images/wheel_williot.png'
                 # Update position and send position data to socket
                 self.option_pos = 10
                 try:
@@ -375,8 +338,8 @@ class DialBox(BoxLayout):
 
     def __auto_select(self):
 
-        # List of wheel thetas. Skip the no-option position
-        theta__ = [0, 36, 72, 144, 180, 216, 252, 324]
+        # List of wheel thetas. Skip the Williot position
+        theta__ = [36, 72, 108, 144, 216, 252, 288, 324]
 
         for theta_ in cycle(theta__):
 
@@ -393,19 +356,7 @@ class DialBox(BoxLayout):
             # Rotate the wheel to theta_   
             self.theta = theta_
 
-            if self.theta >=0 and self.theta <18-self.step_thresh:
-                # Reset adjusted theta (offset)
-                self.adjusted_theta = 0
-                # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_1.png', 'images/legend_wheel_1.png'), 0)
-                # Update position and send position data to socket
-                self.option_pos = 0
-                try:
-                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
-                except Exception as e:
-                    pass
-
-            elif self.theta >=18+self.step_thresh and self.theta <54-self.step_thresh:
+            if self.theta == 36:
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step
                 theta_ = self.theta - self.adjusted_theta
@@ -413,7 +364,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_5.png', 'images/legend_wheel_5.png'), 0)
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_carbon.png'), 0)
                 # Update position and send position data to socket
                 self.option_pos = 1
                 try:
@@ -422,7 +373,7 @@ class DialBox(BoxLayout):
                     pass
                 # print (f'theta release 2 {self.theta}')
 
-            elif self.theta >=54+self.step_thresh and self.theta <90-self.step_thresh:
+            elif self.theta == 72:
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*2
                 theta_ = self.theta - self.adjusted_theta
@@ -430,7 +381,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_4.png', 'images/legend_wheel_4.png'), 0)
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_temp.png'), 0)
                 # Update position and send position data to socket
                 self.option_pos = 2
                 try:
@@ -439,9 +390,24 @@ class DialBox(BoxLayout):
                     pass
                 # print (f'theta release 3 {self.theta}')
 
-            elif self.theta >=126+self.step_thresh and self.theta <162-self.step_thresh:
-                # Snap
-                self.theta = 144
+            elif self.theta == 108:
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step*3
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_fresh.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 3
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 5 {self.theta}')
+
+            elif self.theta == 144:
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*4
                 theta_ = self.theta - self.adjusted_theta
@@ -449,37 +415,16 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_2.png', 'images/legend_wheel_2.png'), 0)
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_food.png'), 0)
                 # Update position and send position data to socket
                 self.option_pos = 4
                 try:
                     self.conn.send(self.option_pos.to_bytes(2, 'big'))
                 except Exception as e:
                     pass
-                # print (f'theta release 5 {self.theta}')
-
-            elif self.theta >=162+self.step_thresh and self.theta <198-self.step_thresh:
-                # Snap
-                self.theta = 180
-                # Offset the theta to produce continuous image
-                self.adjusted_theta = self.segment_step*5
-                theta_ = self.theta - self.adjusted_theta
-                if theta_ < 0:
-                    theta_ += 360
-                self.theta = theta_
-                # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_1.png', 'images/legend_wheel_1.png'), 0)
-                # Update position and send position data to socket
-                self.option_pos = 5
-                try:
-                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
-                except Exception as e:
-                    pass
                 # print (f'theta release 6 {self.theta}')
 
-            elif self.theta >=198+self.step_thresh and self.theta <234-self.step_thresh:
-                # Snap
-                self.theta = 216
+            elif self.theta == 216:
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*6
                 theta_ = self.theta - self.adjusted_theta
@@ -487,18 +432,16 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_5.png', 'images/legend_wheel_5.png'), 0)
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_carbon.png'), 0)
                 # Update position and send position data to socket
                 self.option_pos = 6
                 try:
                     self.conn.send(self.option_pos.to_bytes(2, 'big'))
                 except Exception as e:
                     pass
-                # print (f'theta release 7 {self.theta}')
+                # print (f'theta release 8 {self.theta}')
 
-            elif self.theta >=234+self.step_thresh and self.theta <270-self.step_thresh:
-                # Snap
-                self.theta = 252
+            elif self.theta == 252:
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*7
                 theta_ = self.theta - self.adjusted_theta
@@ -506,18 +449,33 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_4.png', 'images/legend_wheel_4.png'), 0)
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_temp.png'), 0)
                 # Update position and send position data to socket
                 self.option_pos = 7
                 try:
                     self.conn.send(self.option_pos.to_bytes(2, 'big'))
                 except Exception as e:
                     pass
-                # print (f'theta release 8 {self.theta}')
+                # print (f'theta release 10 {self.theta}')
 
-            elif self.theta >=306+self.step_thresh and self.theta <342-self.step_thresh:
-                # Snap
-                self.theta = 324
+            elif self.theta == 288:
+                # Offset the theta to produce continuous image
+                self.adjusted_theta = self.segment_step*8
+                theta_ = self.theta - self.adjusted_theta
+                if theta_ < 0:
+                    theta_ += 360
+                self.theta = theta_
+                # Change the wheel and legend image
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_fresh.png'), 0)
+                # Update position and send position data to socket
+                self.option_pos = 8
+                try:
+                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
+                except Exception as e:
+                    pass
+                # print (f'theta release 10 {self.theta}')
+            
+            elif self.theta == 324:
                 # Offset the theta to produce continuous image
                 self.adjusted_theta = self.segment_step*9
                 theta_ = self.theta - self.adjusted_theta
@@ -525,7 +483,7 @@ class DialBox(BoxLayout):
                     theta_ += 360
                 self.theta = theta_
                 # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_2.png', 'images/legend_wheel_2.png'), 0)
+                Clock.schedule_once(partial(self.update_images, 'images/wheel_food.png'), 0)
                 # Update position and send position data to socket
                 self.option_pos = 9
                 try:
@@ -534,25 +492,7 @@ class DialBox(BoxLayout):
                     pass
                 # print (f'theta release 10 {self.theta}')
 
-            elif self.theta >=342+self.step_thresh and self.theta <360-self.step_thresh:
-                # Snap
-                self.theta = 0
-                # Offset the theta to produce continuous image
-                self.adjusted_theta = 0
-                # Change the wheel and legend image
-                Clock.schedule_once(partial(self.update_images, 'images/wheel_1.png', 'images/legend_wheel_1.png'), 0)
-                # Update position and send position data to socket
-                self.option_pos = 10
-                try:
-                    self.conn.send(self.option_pos.to_bytes(2, 'big'))
-                except Exception as e:
-                    pass
-                # print (f'theta releaes 11 {self.theta}')
 
-
-    def update_images(self, dial_img_source, legend_img_source, *args):
+    def update_images(self, dial_img_source, *args):
         # Change the image
         self.dial_image.source = dial_img_source
-        # Change the legend image
-        self.legend_image.source = legend_img_source
-        self.legend_image.opacity= 1

@@ -16,7 +16,7 @@
     manager: app.manager
     orientation: 'vertical'
     dial_image: dial_image_
-    legend_image: legend_image_
+    title_image: title_image_
 
     FloatLayout:
 
@@ -31,17 +31,19 @@
             id : dial_image_
             angle: root.theta
             pos_hint : {'center_x':0.5, 'center_y': 0.5}
-            size_hint :(None, None) 
-            size :(500, 500) 
-            source:'images/wheel.png'
+            size_hint :(0.8, 0.8) 
+            #size_hint :(None, None) 
+            #size :(500, 500) 
+            source:'images/wheel_williot.png'
+            allow_stretch: True
             on_touch_move: root.on_image_touch_move(*args)
             on_touch_up: root.on_image_release(*args)
             on_touch_down: root.on_image_touch_down(*args)
         
         Image:
-            id : legend_image_
+            id : title_image_
             pos_hint : {'center_y': 0.5}
-            x: dial_image_.right - dp(205)
+            x: dial_image_.right - dp(250)
             size_hint :(None, None) 
             size :(120, 180) 
             source:''

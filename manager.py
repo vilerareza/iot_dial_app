@@ -44,7 +44,7 @@ class Manager(BoxLayout):
                 self.conn.setblocking(False)
                 print ('Connected to dial window')
                 # Updating the image
-                Clock.schedule_once(partial(self.update_image, 'images/no_opt.png'), 0)
+                Clock.schedule_once(partial(self.update_image, 'images/williot.png'), 0)
                 self.sel.register(self.conn, selectors.EVENT_READ, data = None)
                 while not self.stop_flag:
                     events = self.sel.select(timeout = None) #this blocks
@@ -77,26 +77,26 @@ class Manager(BoxLayout):
         print (data)
 
         if data == 3 or data == 8:
-            # Central
-            # Updating the image
-            Clock.schedule_once(partial(self.update_image, 'images/no_opt.png'), 0)
-
-        elif data == 1 or data == 6:
             # Freshness
             # Updating the image
             Clock.schedule_once(partial(self.update_image, 'images/freshness.png'), 0)
 
-        elif data == 2 or data == 7:
-            # Food
-            # Updating the image
-            Clock.schedule_once(partial(self.update_image, 'images/food.png'), 0)
-
-        elif data == 4 or data == 9:
+        elif data == 1 or data == 6:
             # Carbon
             # Updating the image
             Clock.schedule_once(partial(self.update_image, 'images/carbon.png'), 0)
 
-        elif data == 0 or data == 5 or data == 10:
-            # temperature
+        elif data == 2 or data == 7:
+            # Temperature
             # Updating the image
             Clock.schedule_once(partial(self.update_image, 'images/temperature.png'), 0)
+
+        elif data == 4 or data == 9:
+            # Food
+            # Updating the image
+            Clock.schedule_once(partial(self.update_image, 'images/food.png'), 0)
+
+        elif data == 0 or data == 5 or data == 10:
+            # Williot
+            # Updating the image
+            Clock.schedule_once(partial(self.update_image, 'images/williot.png'), 0)
