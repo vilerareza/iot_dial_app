@@ -12,6 +12,7 @@ class DialApp(MDApp):
 
     def build(self):
         Window.minimum_width, Window.minimum_height = (500, 500)
+        self.icon = 'images/icon.png'
         self.manager = Manager()
         return self.manager
 

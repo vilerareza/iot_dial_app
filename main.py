@@ -14,6 +14,7 @@ class LedRatingApp(MDApp):
     def build(self):
         Window.minimum_width, Window.minimum_height = (500, 500)
         self.manager = Manager()
+        self.icon = 'images/icon.png'
         return self.manager
 
     def on_stop(self):
