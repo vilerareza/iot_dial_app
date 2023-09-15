@@ -11,7 +11,7 @@ from functools import partial
 
 import socket
 import selectors
-from threading import Thread
+from threading import Thread, Timer
 
 Builder.load_file('dialbox.kv')
 
@@ -38,8 +38,13 @@ class DialBox(BoxLayout):
     # Current option position (used to trigger the main app)
     option_pos = 0
 
+    # Timeout
+    is_timeout = False
+
+    # Touch timeout (sec)
+    touch_timeout = 5
     # Auto selection timeout in sec
-    auto_selection_timeout = 300
+    t_auto_spin_interval = 1
     
     # Connections to app
     host = '0.0.0.0'
@@ -53,8 +58,14 @@ class DialBox(BoxLayout):
         super().__init__(**kwargs)
         # Start the listening socket from main app
         self.listen_thread()
-        # Start the auto selection thread
-        self.auto_select_thread()
+        # Start the timeout timer
+        self.timer_touch_timeout = Timer(self.touch_timeout, self.__timeout)
+        self.timer_touch_timeout.daemon  = True
+        self.timer_touch_timeout.start()
+        # Initialize the auto spin thread. Dont start it
+        self.t_auto_spin = Thread(target = self.__auto_spin_thread)
+        self.t_auto_spin.daemon = True
+
 
     def __accept_wrapper(self,sock):
         # accept new connections
@@ -123,7 +134,7 @@ class DialBox(BoxLayout):
 
     def on_image_release(self, *args):
 
-        print (self.theta)
+        #print (self.theta)
         if self.moved:
 
             if self.theta >=0 and self.theta <18-self.step_thresh:
@@ -328,25 +339,64 @@ class DialBox(BoxLayout):
                 # print (f'theta releaes 11 {self.theta}')
 
         self.moved = False
+        
+        # Clear the timeout
+        self.is_timeout = False
+
+        # Restart the timeout timer
+        if self.timer_touch_timeout.is_alive():
+            # Restart
+            self.timer_touch_timeout.cancel()
+            self.timer_touch_timeout = Timer(self.touch_timeout, self.__timeout)
+            self.timer_touch_timeout.daemon  = True
+            self.timer_touch_timeout.start()
+        else:
+            # Start
+            self.timer_touch_timeout = Timer(self.touch_timeout, self.__timeout)
+            self.timer_touch_timeout.daemon  = True
+            self.timer_touch_timeout.start()
 
 
-    def auto_select_thread(self):
-        self.t_auto_select = Thread(target = self.__auto_select)
-        self.t_auto_select.daemon = True
-        self.t_auto_select.start()
+
+    # Timeout callback
+    def __timeout(self):
+
+        self.is_timeout = True
+
+        if self.t_auto_spin.is_alive():
+            # Restart
+            self.t_auto_spin.join()
+            self.t_auto_spin = Thread(target = self.__auto_spin_thread)
+            self.t_auto_spin.daemon = True
+            self.t_auto_spin.start()
+        else:
+            # Start 
+            self.t_auto_spin = Thread(target = self.__auto_spin_thread)
+            self.t_auto_spin.daemon = True
+            self.t_auto_spin.start()
+
+        # while not self.stop_flag:
+        #     time.sleep(self.timer_touch_timeout)
+        #     # Timeout
+        #     self.is_timeout = True
+        #     # Run auto spin
+        #     if self.t_auto_spin.is_alive():
+        #         self.t_auto_spin.stop()
+        #     else:
+        #         self.t_auto_spin.start()
 
 
-    def __auto_select(self):
+    def __auto_spin_thread(self):
 
         # List of wheel thetas. Skip the Williot position
         theta__ = [36, 72, 108, 144, 216, 252, 288, 324]
 
         for theta_ in cycle(theta__):
 
-            time.sleep(self.auto_selection_timeout)
+            time.sleep(self.t_auto_spin_interval)
             
-            # Break when stopped
-            if self.stop_flag:
+            # Break when timeout is cleared or application is stopped
+            if (not self.is_timeout) or self.stop_flag:
                 break
 
             # Check if wheel is being moved
