@@ -43,8 +43,8 @@ class DialBox(BoxLayout):
 
     # Touch timeout (sec)
     touch_timeout = 5
-    # Auto selection timeout in sec
-    t_auto_spin_interval = 1
+    # Auto spin interval (sec)
+    auto_spin_interval = 1
     
     # Connections to app
     host = '0.0.0.0'
@@ -393,7 +393,7 @@ class DialBox(BoxLayout):
 
         for theta_ in cycle(theta__):
 
-            time.sleep(self.t_auto_spin_interval)
+            time.sleep(self.auto_spin_interval)
             
             # Break when timeout is cleared or application is stopped
             if (not self.is_timeout) or self.stop_flag:
