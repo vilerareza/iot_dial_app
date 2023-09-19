@@ -7,8 +7,9 @@ from kivy.properties import ObjectProperty, NumericProperty, BooleanProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.clock import Clock
-from functools import partial
+from kivy.core.window import Window
 
+from functools import partial
 import socket
 import selectors
 from threading import Thread, Timer
@@ -54,6 +55,9 @@ class DialBox(BoxLayout):
     stop_flag = False
     conn = None
 
+    # Full screen
+    is_full_screen = False
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Start the listening socket from main app
@@ -65,7 +69,6 @@ class DialBox(BoxLayout):
         # Initialize the auto spin thread. Dont start it
         self.t_auto_spin = Thread(target = self.__auto_spin_thread)
         self.t_auto_spin.daemon = True
-
 
     def __accept_wrapper(self,sock):
         # accept new connections
@@ -118,6 +121,16 @@ class DialBox(BoxLayout):
 
 
     def on_image_touch_down(self, *args):
+
+        # Check if it is a double_tap. Toggle full screen
+        if args[1].is_double_tap:
+            if not self.is_full_screen:
+                Window.fullscreen = 'auto'
+                self.is_full_screen = True
+            else:
+                Window.fullscreen = 0
+                self.is_full_screen = False
+
         if args[0].collide_point(*args[1].pos):
             if args[0] == self.dial_image:
                 x, y = args[1].pos
@@ -133,7 +146,7 @@ class DialBox(BoxLayout):
                 
 
     def on_image_release(self, *args):
-        # print ('release')
+
         # print (self.theta)
         if self.moved:
 
