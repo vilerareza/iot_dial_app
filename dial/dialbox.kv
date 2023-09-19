@@ -23,10 +23,14 @@
             size : self.size
             pos : self.pos
 
-    Image:
-        id : title_image_
-        size_hint :(1, 0.3) 
-        source:'images/title.png'
+    FloatLayout:
+        size_hint :(1, 0.3)
+
+        Image:
+            id : title_image_
+            pos_hint : {'center_x':0.5, 'center_y': 0.5}
+            size_hint :(0.9, 0.9) 
+            source:'images/title.png'
 
     FloatLayout:
 

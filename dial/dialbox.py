@@ -133,8 +133,8 @@ class DialBox(BoxLayout):
                 
 
     def on_image_release(self, *args):
-
-        #print (self.theta)
+        # print ('release')
+        # print (self.theta)
         if self.moved:
 
             if self.theta >=0 and self.theta <18-self.step_thresh:

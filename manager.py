@@ -74,7 +74,7 @@ class Manager(BoxLayout):
         Application logic should be implemented here. 
         The following are sample to update the image based on data received from dial window
         '''
-        print (data)
+        # print (data)
 
         if data == 3 or data == 8:
             # Freshness
