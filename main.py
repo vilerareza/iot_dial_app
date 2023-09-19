@@ -1,10 +1,11 @@
 import subprocess
-from kivy.app import App
+# from kivy.app import App
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.properties import ObjectProperty, BooleanProperty
 
 from manager import Manager
+
 
 class LedRatingApp(MDApp):
     
@@ -21,12 +22,20 @@ class LedRatingApp(MDApp):
         self.stop_flag = True
         self.manager.stop()
 
-# Run the dial app
-dial_app = subprocess.Popen(['python', './dial/main_dial.py'], shell=False)
-print(dial_app)
 
-# Run the main app
-LedRatingApp().run()
+def main():
 
-# Closing dial app
-dial_app.kill()
+    # Run the dial app
+    dial_app = subprocess.Popen(['python', './dial/main_dial.py'], shell=False)
+    # print(dial_app)
+
+    # Run the main app
+    LedRatingApp().run()
+
+    # Closing dial app
+    dial_app.kill()
+
+
+if __name__ == '__main__':
+    # Run
+    main()
